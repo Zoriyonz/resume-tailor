@@ -546,7 +546,7 @@ export default function App() {
         )}
 
         <footer className="footer">
-          <p>© 2025 resume.tailor</p>
+          <p>© 2026 resume.tailor</p>
           <div className="footer-links">
           </div>
         </footer>
