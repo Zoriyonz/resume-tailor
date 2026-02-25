@@ -11,7 +11,6 @@ const styles = `
     --surface: #111110;
     --border: #222220;
     --accent: #c8f050;
-    --accent2: #f0c850;
     --text: #f0ede6;
     --muted: #666660;
     --radius: 4px;
@@ -38,10 +37,7 @@ const styles = `
     display: flex; align-items: center; justify-content: space-between;
     border-bottom: 1px solid var(--border);
   }
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800; font-size: 20px; letter-spacing: -0.5px;
-  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
   .logo span { color: var(--accent); }
 
   .hero { padding: 64px 0 40px; }
@@ -49,68 +45,44 @@ const styles = `
     font-family: 'Syne', sans-serif;
     font-size: clamp(36px, 6vw, 68px);
     font-weight: 800; line-height: 1.0;
-    letter-spacing: -2px;
-    margin-bottom: 20px;
+    letter-spacing: -2px; margin-bottom: 20px;
   }
   .hero h1 em { color: var(--accent); font-style: normal; }
-  .hero p {
-    font-size: 14px; color: var(--muted);
-    max-width: 480px; line-height: 1.7;
-    margin-bottom: 32px;
-  }
-  .steps { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 0; }
+  .hero p { font-size: 14px; color: var(--muted); max-width: 480px; line-height: 1.7; margin-bottom: 32px; }
+  .steps { display: flex; gap: 24px; flex-wrap: wrap; }
   .step { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
   .step-num {
-    width: 20px; height: 20px;
-    border: 1px solid var(--border);
-    border-radius: 50%;
+    width: 20px; height: 20px; border: 1px solid var(--border); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px; color: var(--accent);
-    flex-shrink: 0;
+    font-size: 10px; color: var(--accent); flex-shrink: 0;
   }
 
   .divider { height: 1px; background: var(--border); margin: 40px 0; }
 
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
-  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
   @media(max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
 
   .field label {
-    display: block;
-    font-size: 11px; letter-spacing: 0.1em;
-    color: var(--muted); text-transform: uppercase;
-    margin-bottom: 8px;
+    display: block; font-size: 11px; letter-spacing: 0.1em;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 8px;
   }
   .field label span { color: var(--accent); margin-left: 4px; }
 
   textarea {
-    width: 100%; height: 260px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px; line-height: 1.6;
-    padding: 16px;
-    resize: vertical;
-    transition: border-color 0.2s;
-    outline: none;
+    width: 100%; height: 260px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: 12px; line-height: 1.6; padding: 16px;
+    resize: vertical; transition: border-color 0.2s; outline: none;
   }
   textarea:focus { border-color: var(--accent); }
   textarea::placeholder { color: #333330; }
 
   .pricing-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 20px;
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 20px;
-    flex-wrap: wrap; gap: 12px;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
   }
   .pricing-info { font-size: 13px; color: var(--muted); }
   .pricing-info strong { color: var(--text); font-size: 15px; }
@@ -118,15 +90,10 @@ const styles = `
   .price-tag span { font-size: 14px; color: var(--muted); font-family: 'DM Mono', monospace; font-weight: 300; }
 
   .btn-main {
-    width: 100%;
-    background: var(--accent);
-    color: #0a0a08;
+    width: 100%; background: var(--accent); color: #0a0a08;
     border: none; border-radius: var(--radius);
-    font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: 15px;
-    letter-spacing: 0.02em;
-    padding: 16px 32px;
-    cursor: pointer;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px;
+    letter-spacing: 0.02em; padding: 16px 32px; cursor: pointer;
     transition: opacity 0.15s, transform 0.1s;
   }
   .btn-main:hover { opacity: 0.9; }
@@ -136,93 +103,62 @@ const styles = `
   .output-section { margin-top: 40px; animation: fadeUp 0.4s ease; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
-  .output-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
-  }
+  .output-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
   .output-label {
-    font-size: 11px; letter-spacing: 0.1em;
-    color: var(--accent); text-transform: uppercase;
-    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; letter-spacing: 0.1em; color: var(--accent);
+    text-transform: uppercase; display: flex; align-items: center; gap: 8px;
   }
   .output-label::before {
-    content: ''; display: block;
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 1.5s infinite;
+    content: ''; display: block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); animation: pulse 1.5s infinite;
   }
   @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
 
   .btn-copy {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px; padding: 6px 14px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: all 0.2s;
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: 12px; padding: 6px 14px;
+    border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
   }
   .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
 
   .output-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    font-size: 13px; line-height: 1.8;
-    white-space: pre-wrap;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+    font-size: 13px; line-height: 1.8; white-space: pre-wrap;
     max-height: 500px; overflow-y: auto;
   }
   .output-box::-webkit-scrollbar { width: 4px; }
-  .output-box::-webkit-scrollbar-track { background: transparent; }
   .output-box::-webkit-scrollbar-thumb { background: var(--border); }
 
   .loading-state { text-align: center; padding: 60px 20px; animation: fadeUp 0.3s ease; }
   .spinner {
-    width: 32px; height: 32px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto 16px;
+    width: 32px; height: 32px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.7s linear infinite; margin: 0 auto 16px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-state p { color: var(--muted); font-size: 13px; }
 
   .error-msg {
-    background: #1a0808;
-    border: 1px solid #400;
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    font-size: 13px; color: #ff6b6b;
-    margin-bottom: 12px;
+    background: #1a0808; border: 1px solid #400; border-radius: var(--radius);
+    padding: 12px 16px; font-size: 13px; color: #ff6b6b; margin-bottom: 12px;
   }
 
   .success-banner {
-    background: #0a1a08;
-    border: 1px solid #2a4a20;
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    font-size: 13px; color: var(--accent);
-    margin-bottom: 12px;
-    text-align: center;
+    background: #0a1a08; border: 1px solid #2a4a20; border-radius: var(--radius);
+    padding: 12px 16px; font-size: 13px; color: var(--accent);
+    margin-bottom: 12px; text-align: center;
   }
 
   .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.85);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
     display: flex; align-items: center; justify-content: center;
-    z-index: 200; padding: 20px;
-    animation: fadeIn 0.2s ease;
+    z-index: 200; padding: 20px; animation: fadeIn 0.2s ease;
   }
   @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
   .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 36px;
-    max-width: 440px; width: 100%;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 36px; max-width: 440px; width: 100%;
     animation: slideUp 0.25s ease;
   }
   @keyframes slideUp { from{transform:translateY(20px);opacity:0;} to{transform:translateY(0);opacity:1;} }
@@ -232,100 +168,32 @@ const styles = `
   .modal-desc { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
   .modal-features { margin-bottom: 28px; }
   .modal-feature {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 13px; color: var(--muted);
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted);
+    padding: 6px 0; border-bottom: 1px solid var(--border);
   }
   .modal-feature:last-child { border: none; }
   .modal-feature::before { content: '✓'; color: var(--accent); font-weight: bold; }
   .modal-actions { display: flex; gap: 10px; }
   .btn-cancel {
-    flex: 1; background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px; padding: 12px;
-    border-radius: var(--radius); cursor: pointer;
-    transition: all 0.2s;
+    flex: 1; background: transparent; border: 1px solid var(--border); color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: 13px; padding: 12px;
+    border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
   }
   .btn-cancel:hover { border-color: var(--muted); color: var(--text); }
   .btn-pay {
-    flex: 2; background: var(--accent); color: #0a0a08;
-    border: none; border-radius: var(--radius);
-    font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: 14px;
-    padding: 12px; cursor: pointer;
-    transition: opacity 0.15s;
+    flex: 2; background: var(--accent); color: #0a0a08; border: none;
+    border-radius: var(--radius); font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 14px; padding: 12px; cursor: pointer; transition: opacity 0.15s;
   }
   .btn-pay:hover { opacity: 0.9; }
 
   .footer {
-    padding: 40px 0;
-    border-top: 1px solid var(--border);
+    padding: 40px 0; border-top: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
     margin-top: 60px; flex-wrap: wrap; gap: 12px;
   }
   .footer p { font-size: 11px; color: var(--muted); }
 `;
-
-async function tailorResume(resume, jobDescription) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": process.env.NEXT_PUBLIC_ANTHROPIC_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true"
-    },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 1500,
-      system: `You are an elite resume writer and ATS optimization specialist with 15+ years of experience helping candidates land jobs at top companies.
-
-Your job is to rewrite a resume to perfectly match a specific job description.
-
-Follow these rules STRICTLY:
-
-FORMATTING:
-- Use clean, consistent formatting throughout
-- Section headers in ALL CAPS (EXPERIENCE, EDUCATION, SKILLS, SUMMARY, etc.)
-- Bullet points starting with strong action verbs (Led, Built, Increased, Managed, Developed, etc.)
-- Each bullet point on its own line starting with •
-- Keep contact info at the top exactly as provided
-- Consistent date formatting (e.g. Jan 2022 – Mar 2024)
-- One blank line between sections
-
-ATS OPTIMIZATION:
-- Mirror the EXACT keywords and phrases from the job description — do not paraphrase them
-- Include the job title from the posting naturally in the summary
-- Add relevant skills from the job description to the skills section if the candidate plausibly has them
-- Put the most relevant experience and bullets FIRST within each role
-
-CONTENT IMPROVEMENTS:
-- Rewrite bullets to be achievement-focused, not task-focused
-- Add metrics and numbers wherever plausible (percentages, team sizes, time saved, revenue impact)
-- Start every bullet with a powerful action verb — never start with "Responsible for" or "Helped"
-- Remove or condense experience that is irrelevant to this specific role
-- Rewrite the summary to speak DIRECTLY to this job and company
-
-OUTPUT FORMAT:
-Return ONLY the tailored resume. No commentary, no explanations, no notes.
-Do not say "Here is your tailored resume" or anything like that.
-Just output the resume, clean and ready to copy-paste.`,
-      messages: [
-        {
-          role: "user",
-          content: `Here is my resume:\n\n${resume}\n\n---\n\nHere is the job description I'm applying to:\n\n${jobDescription}\n\n---\n\nPlease tailor my resume to this job description.`
-        }
-      ]
-    })
-  });
-
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content[0].text;
-}
 
 export default function App() {
   const [resume, setResume] = useState("");
@@ -340,24 +208,18 @@ export default function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("payment") === "success") {
-      // Clean URL immediately
       window.history.replaceState({}, "", window.location.pathname);
-
-      // Retrieve from localStorage (persists through redirects)
       const pendingResume = localStorage.getItem("pending_resume");
       const pendingJob = localStorage.getItem("pending_job");
-
       if (pendingResume && pendingJob) {
         setResume(pendingResume);
         setJobDesc(pendingJob);
         setPaymentSuccess(true);
-        // Clear storage
         localStorage.removeItem("pending_resume");
         localStorage.removeItem("pending_job");
-        // Auto-run
         runTailor(pendingResume, pendingJob);
       } else {
-        setError("Your session expired. Please paste your resume and job description again and click the button — no need to pay again, just refresh and retry.");
+        setError("Session expired — paste your resume and job description again and click the button.");
       }
     }
   }, []);
@@ -367,8 +229,14 @@ export default function App() {
     setError("");
     setOutput("");
     try {
-      const result = await tailorResume(r, j);
-      setOutput(result);
+      const response = await fetch("/api/tailor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resume: r, jobDescription: j })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setOutput(data.result);
     } catch (err) {
       setError("Something went wrong: " + err.message);
     } finally {
@@ -376,20 +244,27 @@ export default function App() {
     }
   }
 
+  //function handleSubmit() {
+  //  if (!resume.trim() || !jobDesc.trim()) {
+  //    setError("Please paste both your resume and the job description.");
+  //    return;
+  //  }
+  //  setError("");
+  //  setShowPayModal(true);
+  // }
+
   function handleSubmit() {
     if (!resume.trim() || !jobDesc.trim()) {
       setError("Please paste both your resume and the job description.");
       return;
     }
     setError("");
-    setShowPayModal(true);
+    runTailor(resume, jobDesc); // skip payment for testing
+    // setShowPayModal(true); // uncomment when done testing
   }
-
   function handlePay() {
-    // Save to localStorage — persists through Stripe redirect
     localStorage.setItem("pending_resume", resume);
     localStorage.setItem("pending_job", jobDesc);
-    // Redirect to Stripe
     window.location.href = "https://buy.stripe.com/dRmaEX2ye7CseWlg1G1wY00";
   }
 
@@ -476,11 +351,7 @@ export default function App() {
 
         {error && <div className="error-msg">{error}</div>}
 
-        <button
-          className="btn-main"
-          onClick={handleSubmit}
-          disabled={!canSubmit || loading}
-        >
+        <button className="btn-main" onClick={handleSubmit} disabled={!canSubmit || loading}>
           {loading ? "Tailoring your resume..." : "Tailor My Resume for $2 →"}
         </button>
 
@@ -505,7 +376,6 @@ export default function App() {
 
         <footer className="footer">
           <p>© 2026 resume.tailor</p>
-          <div className="footer-links"></div>
         </footer>
       </div>
     </>
