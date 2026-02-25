@@ -548,9 +548,6 @@ export default function App() {
         <footer className="footer">
           <p>© 2025 resume.tailor</p>
           <div className="footer-links">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="mailto:you@youremail.com">Contact</a>
           </div>
         </footer>
       </div>
