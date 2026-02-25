@@ -1,9 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const STRIPE_PUBLISHABLE_KEY = "YOUR_STRIPE_PUBLISHABLE_KEY"; // Replace this
-const YOUR_DOMAIN = "http://localhost:3000"; // Replace with your deployed URL
-
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
 
@@ -36,7 +33,6 @@ const styles = `
 
   .app { max-width: 960px; margin: 0 auto; padding: 0 24px; }
 
-  /* HEADER */
   .header {
     padding: 40px 0 20px;
     display: flex; align-items: center; justify-content: space-between;
@@ -47,13 +43,7 @@ const styles = `
     font-weight: 800; font-size: 20px; letter-spacing: -0.5px;
   }
   .logo span { color: var(--accent); }
-  .badge {
-    font-size: 11px; letter-spacing: 0.08em;
-    background: var(--accent); color: #0a0a08;
-    padding: 4px 10px; border-radius: 2px; font-weight: 500;
-  }
 
-  /* HERO */
   .hero { padding: 64px 0 40px; }
   .hero h1 {
     font-family: 'Syne', sans-serif;
@@ -68,14 +58,8 @@ const styles = `
     max-width: 480px; line-height: 1.7;
     margin-bottom: 32px;
   }
-  .steps {
-    display: flex; gap: 24px; flex-wrap: wrap;
-    margin-bottom: 0;
-  }
-  .step {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 12px; color: var(--muted);
-  }
+  .steps { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 0; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
   .step-num {
     width: 20px; height: 20px;
     border: 1px solid var(--border);
@@ -85,10 +69,8 @@ const styles = `
     flex-shrink: 0;
   }
 
-  /* DIVIDER */
   .divider { height: 1px; background: var(--border); margin: 40px 0; }
 
-  /* FORM */
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -121,7 +103,6 @@ const styles = `
   textarea:focus { border-color: var(--accent); }
   textarea::placeholder { color: #333330; }
 
-  /* PRICING BAR */
   .pricing-bar {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -133,14 +114,9 @@ const styles = `
   }
   .pricing-info { font-size: 13px; color: var(--muted); }
   .pricing-info strong { color: var(--text); font-size: 15px; }
-  .price-tag {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px; font-weight: 800;
-    color: var(--accent);
-  }
+  .price-tag { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--accent); }
   .price-tag span { font-size: 14px; color: var(--muted); font-family: 'DM Mono', monospace; font-weight: 300; }
 
-  /* BUTTON */
   .btn-main {
     width: 100%;
     background: var(--accent);
@@ -152,17 +128,12 @@ const styles = `
     padding: 16px 32px;
     cursor: pointer;
     transition: opacity 0.15s, transform 0.1s;
-    position: relative; overflow: hidden;
   }
   .btn-main:hover { opacity: 0.9; }
   .btn-main:active { transform: scale(0.99); }
   .btn-main:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* OUTPUT */
-  .output-section {
-    margin-top: 40px;
-    animation: fadeUp 0.4s ease;
-  }
+  .output-section { margin-top: 40px; animation: fadeUp 0.4s ease; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
   .output-header {
@@ -207,11 +178,7 @@ const styles = `
   .output-box::-webkit-scrollbar-track { background: transparent; }
   .output-box::-webkit-scrollbar-thumb { background: var(--border); }
 
-  /* LOADING */
-  .loading-state {
-    text-align: center; padding: 60px 20px;
-    animation: fadeUp 0.3s ease;
-  }
+  .loading-state { text-align: center; padding: 60px 20px; animation: fadeUp 0.3s ease; }
   .spinner {
     width: 32px; height: 32px;
     border: 2px solid var(--border);
@@ -223,17 +190,25 @@ const styles = `
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-state p { color: var(--muted); font-size: 13px; }
 
-  /* ERROR */
   .error-msg {
     background: #1a0808;
     border: 1px solid #400;
     border-radius: var(--radius);
     padding: 12px 16px;
     font-size: 13px; color: #ff6b6b;
-    margin-top: 12px;
+    margin-bottom: 12px;
   }
 
-  /* PAYMENT MODAL */
+  .success-banner {
+    background: #0a1a08;
+    border: 1px solid #2a4a20;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px; color: var(--accent);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
   .modal-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.85);
@@ -251,17 +226,9 @@ const styles = `
     animation: slideUp 0.25s ease;
   }
   @keyframes slideUp { from{transform:translateY(20px);opacity:0;} to{transform:translateY(0);opacity:1;} }
-  .modal h2 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800; font-size: 24px;
-    margin-bottom: 8px;
-  }
+  .modal h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 24px; margin-bottom: 8px; }
   .modal p { font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
-  .modal-price {
-    font-family: 'Syne', sans-serif;
-    font-size: 48px; font-weight: 800;
-    color: var(--accent); margin-bottom: 4px;
-  }
+  .modal-price { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
   .modal-desc { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
   .modal-features { margin-bottom: 28px; }
   .modal-feature {
@@ -293,7 +260,6 @@ const styles = `
   }
   .btn-pay:hover { opacity: 0.9; }
 
-  /* FOOTER */
   .footer {
     padding: 40px 0;
     border-top: 1px solid var(--border);
@@ -301,19 +267,20 @@ const styles = `
     margin-top: 60px; flex-wrap: wrap; gap: 12px;
   }
   .footer p { font-size: 11px; color: var(--muted); }
-  .footer-links { display: flex; gap: 20px; }
-  .footer-links a { font-size: 11px; color: var(--muted); text-decoration: none; }
-  .footer-links a:hover { color: var(--text); }
 `;
 
-// ─── Claude API Call ───────────────────────────────────────────────────────────
 async function tailorResume(resume, jobDescription) {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.NEXT_PUBLIC_ANTHROPIC_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
     body: JSON.stringify({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 1000,
+      max_tokens: 1500,
       system: `You are an elite resume writer and ATS optimization specialist with 15+ years of experience helping candidates land jobs at top companies.
 
 Your job is to rewrite a resume to perfectly match a specific job description.
@@ -360,7 +327,6 @@ Just output the resume, clean and ready to copy-paste.`,
   return data.content[0].text;
 }
 
-// ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [resume, setResume] = useState("");
   const [jobDesc, setJobDesc] = useState("");
@@ -368,34 +334,33 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPayModal, setShowPayModal] = useState(false);
-  const [paid, setPaid] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // Check URL for successful Stripe payment
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("payment") === "success") {
-      // Payment confirmed — retrieve pending data from sessionStorage and process
-      const pendingResume = sessionStorage.getItem("pending_resume");
-      const pendingJob = sessionStorage.getItem("pending_job");
+      // Clean URL immediately
+      window.history.replaceState({}, "", window.location.pathname);
+
+      // Retrieve from localStorage (persists through redirects)
+      const pendingResume = localStorage.getItem("pending_resume");
+      const pendingJob = localStorage.getItem("pending_job");
+
       if (pendingResume && pendingJob) {
         setResume(pendingResume);
         setJobDesc(pendingJob);
-        setPaid(true);
-        sessionStorage.removeItem("pending_resume");
-        sessionStorage.removeItem("pending_job");
+        setPaymentSuccess(true);
+        // Clear storage
+        localStorage.removeItem("pending_resume");
+        localStorage.removeItem("pending_job");
+        // Auto-run
+        runTailor(pendingResume, pendingJob);
+      } else {
+        setError("Your session expired. Please paste your resume and job description again and click the button — no need to pay again, just refresh and retry.");
       }
-      // Clean URL
-      window.history.replaceState({}, "", window.location.pathname);
     }
   }, []);
-
-  // Auto-run after successful payment
-  useEffect(() => {
-    if (paid && resume && jobDesc) {
-      runTailor(resume, jobDesc);
-    }
-  }, [paid]);
 
   async function runTailor(r, j) {
     setLoading(true);
@@ -420,22 +385,12 @@ export default function App() {
     setShowPayModal(true);
   }
 
-  async function handlePay() {
-    // Store inputs in sessionStorage so we can retrieve after Stripe redirect
-    sessionStorage.setItem("pending_resume", resume);
-    sessionStorage.setItem("pending_job", jobDesc);
-
-    // ── OPTION A: Stripe Payment Links (EASIEST — no backend needed!) ──────────
-    // 1. Go to dashboard.stripe.com → Payment Links → Create
-    // 2. Add a product: "Resume Tailor" $2.00 one-time
-    // 3. Set success URL to: YOUR_DOMAIN + "?payment=success"
-    // 4. Replace the URL below with your Payment Link
-    window.location.href = "https://buy.stripe.com/YOUR_PAYMENT_LINK";
-
-    // ── OPTION B: If you add a backend (Node/Next.js), use Stripe Checkout ──────
-    // const res = await fetch("/api/create-checkout", { method: "POST" });
-    // const { url } = await res.json();
-    // window.location.href = url;
+  function handlePay() {
+    // Save to localStorage — persists through Stripe redirect
+    localStorage.setItem("pending_resume", resume);
+    localStorage.setItem("pending_job", jobDesc);
+    // Redirect to Stripe
+    window.location.href = "https://buy.stripe.com/dRmaEX2ye7CseWlg1G1wY00";
   }
 
   function handleCopy() {
@@ -489,6 +444,10 @@ export default function App() {
 
         <div className="divider" />
 
+        {paymentSuccess && !output && !loading && (
+          <div className="success-banner">✓ Payment confirmed — tailoring your resume now...</div>
+        )}
+
         <div className="form-grid">
           <div className="field">
             <label>Your Current Resume <span>*</span></label>
@@ -521,7 +480,6 @@ export default function App() {
           className="btn-main"
           onClick={handleSubmit}
           disabled={!canSubmit || loading}
-          style={{ marginTop: error ? "12px" : "0" }}
         >
           {loading ? "Tailoring your resume..." : "Tailor My Resume for $2 →"}
         </button>
@@ -529,7 +487,7 @@ export default function App() {
         {loading && (
           <div className="loading-state">
             <div className="spinner" />
-            <p>Claude is rewriting your resume...<br />This takes about 15 seconds.</p>
+            <p>Rewriting your resume...<br />This takes about 15 seconds.</p>
           </div>
         )}
 
@@ -547,8 +505,7 @@ export default function App() {
 
         <footer className="footer">
           <p>© 2026 resume.tailor</p>
-          <div className="footer-links">
-          </div>
+          <div className="footer-links"></div>
         </footer>
       </div>
     </>
