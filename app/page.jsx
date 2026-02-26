@@ -140,15 +140,13 @@ function downloadAsPDF(text) {
         body += `<li>${esc(l.replace(/^[•\-▸]\s*/, ""))}</li>`;
       } else {
         if (inList) { body += `</ul>`; inList = false; }
-        // First non-bullet line in a section = role/company (bold)
         if (firstNonBullet) {
           body += `<p class="role-line">${esc(l)}</p>`;
           firstNonBullet = false;
         } else {
-          // Check if it looks like a date line
           const isDate = /\d{4}/.test(l) || /present/i.test(l) || /jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(l);
           body += `<p class="${isDate ? "date-line" : "body-line"}">${esc(l)}</p>`;
-          if (!isDate) firstNonBullet = true; // reset for next role block
+          if (!isDate) firstNonBullet = true;
         }
       }
     }
@@ -167,17 +165,14 @@ function downloadAsPDF(text) {
   body { font-family:'Inter',Arial,sans-serif; font-size:10.5pt; color:#1c1c1c; background:white; }
   .page { max-width:760px; margin:0 auto; padding:52px 60px; }
 
-  /* HEADER */
   .resume-header { text-align:center; padding-bottom:18px; margin-bottom:22px; border-bottom:2.5px solid #111; }
   .name { font-size:24pt; font-weight:700; letter-spacing:-0.3px; color:#0a0a0a; margin-bottom:7px; line-height:1.1; }
   .contact { font-size:9pt; color:#555; margin-top:2px; line-height:1.5; }
 
-  /* SECTION HEADER with extending line */
   .sec-header { display:flex; align-items:center; margin-bottom:7px; margin-top:2px; }
   .sec-title { font-size:8pt; font-weight:700; letter-spacing:0.14em; color:#111; text-transform:uppercase; white-space:nowrap; padding-right:10px; }
   .sec-header::after { content:''; flex:1; height:1px; background:#bbb; }
 
-  /* SECTION BODY */
   .sec-body { padding-left:0; }
   .section { margin-bottom:16px; }
 
@@ -220,15 +215,19 @@ export default function App() {
   const [showPayModal, setShowPayModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+
   const [resumeMode, setResumeMode] = useState("text");
   const [jobMode, setJobMode] = useState("text");
+
   const [resumeFile, setResumeFile] = useState(null);
   const [jobFile, setJobFile] = useState(null);
+
+  const [resumePdfB64, setResumePdfB64] = useState(null);
+  const [jobPdfB64, setJobPdfB64] = useState(null);
+
   const [resumeDragging, setResumeDragging] = useState(false);
   const [jobDragging, setJobDragging] = useState(false);
-  // Store PDF base64 in memory — NOT localStorage (too large, corrupts)
-  const resumePdfB64 = useRef(null);
-  const jobPdfB64 = useRef(null);
+
   const resumeFileRef = useRef();
   const jobFileRef = useRef();
 
@@ -254,24 +253,71 @@ export default function App() {
   function readFileAsBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+
+      reader.onload = () => {
+        try {
+          const buf = reader.result; // ArrayBuffer
+          const bytes = new Uint8Array(buf);
+
+          // Validate PDF magic header: %PDF-
+          const magic = String.fromCharCode(...bytes.slice(0, 5));
+          if (magic !== "%PDF-") {
+            reject(new Error(`Not a valid PDF (missing %PDF- header). Got: "${magic}"`));
+            return;
+          }
+
+          // Convert bytes -> base64 safely (chunked)
+          let binary = "";
+          const chunkSize = 0x8000;
+          for (let i = 0; i < bytes.length; i += chunkSize) {
+            binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+          }
+          const b64 = btoa(binary);
+          resolve(b64);
+        } catch (e) {
+          reject(e);
+        }
+      };
+
+      reader.onerror = () => reject(new Error("Failed to read file."));
+      reader.readAsArrayBuffer(file);
     });
   }
 
   async function handleResumeFileChange(file) {
     if (!file) return;
+    if (file.type !== "application/pdf") { setError("Please upload a .pdf file."); return; }
+
+    setError("");
     setResumeFile(file);
-    const b64 = await readFileAsBase64(file);
-    resumePdfB64.current = b64;
+    setResumePdfB64(null); // force “ready” to re-compute
+
+    try {
+      const b64 = await readFileAsBase64(file);
+      setResumePdfB64(b64);
+    } catch (e) {
+      setResumeFile(null);
+      setResumePdfB64(null);
+      setError(e.message || "Invalid PDF.");
+    }
   }
 
   async function handleJobFileChange(file) {
     if (!file) return;
+    if (file.type !== "application/pdf") { setError("Please upload a .pdf file."); return; }
+
+    setError("");
     setJobFile(file);
-    const b64 = await readFileAsBase64(file);
-    jobPdfB64.current = b64;
+    setJobPdfB64(null);
+
+    try {
+      const b64 = await readFileAsBase64(file);
+      setJobPdfB64(b64);
+    } catch (e) {
+      setJobFile(null);
+      setJobPdfB64(null);
+      setError(e.message || "Invalid PDF.");
+    }
   }
 
   async function runTailor(r, j) {
@@ -300,26 +346,24 @@ export default function App() {
     let jobData = jobDesc;
 
     if (resumeMode === "pdf") {
-      if (!resumeFile || !resumePdfB64.current) { setError("Please upload your resume PDF."); return; }
-      resumeData = "__PDF__" + resumePdfB64.current;
+      if (!resumeFile || !resumePdfB64) { setError("Please upload your resume PDF."); return; }
+      resumeData = "__PDF__" + resumePdfB64;
     } else if (resumeData.trim().length < 50) {
       setError("Please paste your resume."); return;
     }
 
     if (jobMode === "pdf") {
-      if (!jobFile || !jobPdfB64.current) { setError("Please upload the job description PDF."); return; }
-      jobData = "__PDF__" + jobPdfB64.current;
+      if (!jobFile || !jobPdfB64) { setError("Please upload the job description PDF."); return; }
+      jobData = "__PDF__" + jobPdfB64;
     } else if (jobData.trim().length < 50) {
       setError("Please paste the job description."); return;
     }
 
-    // Only save text data to localStorage (PDFs are too large)
     if (resumeMode === "text") localStorage.setItem("pending_resume", resumeData);
     if (jobMode === "text") localStorage.setItem("pending_job", jobData);
 
-    // TESTING: skip payment
     runTailor(resumeData, jobData);
-    // setShowPayModal(true); // LIVE: uncomment when going live
+    // setShowPayModal(true); // LIVE
   }
 
   function handlePay() {
@@ -332,18 +376,23 @@ export default function App() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function handleDrop(e, type) {
+  async function handleDrop(e, type) {
     e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file?.type === "application/pdf") {
-      if (type === "resume") { handleResumeFileChange(file); setResumeDragging(false); }
-      else { handleJobFileChange(file); setJobDragging(false); }
+    const file = e.dataTransfer.files?.[0];
+    if (!file || file.type !== "application/pdf") return;
+
+    if (type === "resume") {
+      setResumeDragging(false);
+      await handleResumeFileChange(file);
+    } else {
+      setJobDragging(false);
+      await handleJobFileChange(file);
     }
   }
 
   const canSubmit = !loading && (
-    (resumeMode === "text" ? resume.trim().length > 50 : !!resumeFile) &&
-    (jobMode === "text" ? jobDesc.trim().length > 50 : !!jobFile)
+    (resumeMode === "text" ? resume.trim().length > 50 : (!!resumeFile && !!resumePdfB64)) &&
+    (jobMode === "text" ? jobDesc.trim().length > 50 : (!!jobFile && !!jobPdfB64))
   );
 
   return (
@@ -404,15 +453,28 @@ export default function App() {
               <textarea placeholder={"Paste your full resume here...\n\nJohn Smith\njohn@email.com\n\nEXPERIENCE\nSoftware Engineer at Acme Corp..."} value={resume} onChange={e => setResume(e.target.value)} />
             ) : (
               <>
-                <input type="file" accept=".pdf" ref={resumeFileRef} className="upload-input" onChange={e => handleResumeFileChange(e.target.files[0])} />
-                <div className={`upload-zone ${resumeDragging ? "dragging" : ""} ${resumeFile ? "has-file" : ""}`}
+                <input
+                  type="file"
+                  accept=".pdf"
+                  ref={resumeFileRef}
+                  className="upload-input"
+                  onChange={e => handleResumeFileChange(e.target.files?.[0])}
+                />
+                <div
+                  className={`upload-zone ${resumeDragging ? "dragging" : ""} ${resumeFile ? "has-file" : ""}`}
                   onClick={() => resumeFileRef.current.click()}
                   onDragOver={e => { e.preventDefault(); setResumeDragging(true); }}
                   onDragLeave={() => setResumeDragging(false)}
-                  onDrop={e => handleDrop(e, "resume")}>
+                  onDrop={e => handleDrop(e, "resume")}
+                >
                   <div className="upload-icon">{resumeFile ? "✅" : "📄"}</div>
                   {resumeFile
-                    ? <div className="upload-text"><strong>Resume uploaded</strong><span className="upload-filename">{resumeFile.name}</span></div>
+                    ? (
+                      <div className="upload-text">
+                        <strong>{resumePdfB64 ? "Resume uploaded" : "Processing PDF..."}</strong>
+                        <span className="upload-filename">{resumeFile.name}</span>
+                      </div>
+                    )
                     : <div className="upload-text"><strong>Drop PDF here or click to browse</strong>.pdf files only</div>}
                 </div>
               </>
@@ -429,15 +491,28 @@ export default function App() {
               <textarea placeholder={"Paste the full job posting here...\n\nSenior Software Engineer\nWe're looking for...\n\nRequirements:\n- 3+ years experience..."} value={jobDesc} onChange={e => setJobDesc(e.target.value)} />
             ) : (
               <>
-                <input type="file" accept=".pdf" ref={jobFileRef} className="upload-input" onChange={e => handleJobFileChange(e.target.files[0])} />
-                <div className={`upload-zone ${jobDragging ? "dragging" : ""} ${jobFile ? "has-file" : ""}`}
+                <input
+                  type="file"
+                  accept=".pdf"
+                  ref={jobFileRef}
+                  className="upload-input"
+                  onChange={e => handleJobFileChange(e.target.files?.[0])}
+                />
+                <div
+                  className={`upload-zone ${jobDragging ? "dragging" : ""} ${jobFile ? "has-file" : ""}`}
                   onClick={() => jobFileRef.current.click()}
                   onDragOver={e => { e.preventDefault(); setJobDragging(true); }}
                   onDragLeave={() => setJobDragging(false)}
-                  onDrop={e => handleDrop(e, "job")}>
+                  onDrop={e => handleDrop(e, "job")}
+                >
                   <div className="upload-icon">{jobFile ? "✅" : "📋"}</div>
                   {jobFile
-                    ? <div className="upload-text"><strong>Job description uploaded</strong><span className="upload-filename">{jobFile.name}</span></div>
+                    ? (
+                      <div className="upload-text">
+                        <strong>{jobPdfB64 ? "Job description uploaded" : "Processing PDF..."}</strong>
+                        <span className="upload-filename">{jobFile.name}</span>
+                      </div>
+                    )
                     : <div className="upload-text"><strong>Drop PDF here or click to browse</strong>.pdf files only</div>}
                 </div>
               </>

@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 export async function POST(request) {
     const { resume, jobDescription } = await request.json();
 
@@ -35,18 +37,40 @@ OUTPUT: Return ONLY the resume. No commentary, no intro text.`;
 
     const isPdfString = (v) => typeof v === "string" && v.startsWith("__PDF__");
 
-    // Normalize base64: remove whitespace/newlines and ensure it's pure base64 chars.
-    const normalizeB64 = (b64) =>
-        b64
-            .replace(/^data:application\/pdf;base64,/, "")
-            .replace(/\s+/g, "");
+    const normalizeB64 = (b64) => {
+        let s = (b64 || "").trim();
+        // If someone ever sends a data URL by mistake, strip it.
+        s = s.replace(/^data:application\/pdf;base64,/, "");
+        // Remove whitespace/newlines
+        s = s.replace(/\s+/g, "");
+        // base64url -> base64 (defensive)
+        s = s.replace(/-/g, "+").replace(/_/g, "/");
+        // fix padding
+        const pad = s.length % 4;
+        if (pad) s += "=".repeat(4 - pad);
+        return s;
+    };
+
+    const assertValidPdfBase64 = (b64, label) => {
+        let buf;
+        try {
+            buf = Buffer.from(b64, "base64");
+        } catch {
+            throw new Error(`${label}: Invalid base64 data (server could not decode).`);
+        }
+        const head = buf.subarray(0, 5).toString("utf8");
+        if (head !== "%PDF-") {
+            // This is the exact failure you saw: "Sarah" etc.
+            throw new Error(`${label}: Not a valid PDF (missing %PDF- header). Got: "${head}"`);
+        }
+    };
 
     function buildContent(data, label) {
         if (isPdfString(data)) {
-            const rawB64 = normalizeB64(data.substring("__PDF__".length));
+            const rawB64 = normalizeB64(data.slice("__PDF__".length));
 
-            // IMPORTANT: Anthropic PDF beta works reliably with a data URL
-            const dataUrl = `data:application/pdf;base64,${rawB64}`;
+            // Fail fast with a useful message
+            assertValidPdfBase64(rawB64, label);
 
             return [
                 {
@@ -54,20 +78,24 @@ OUTPUT: Return ONLY the resume. No commentary, no intro text.`;
                     source: {
                         type: "base64",
                         media_type: "application/pdf",
-                        data: dataUrl, // <-- key fix: include data URL prefix
+                        data: rawB64, // IMPORTANT: RAW base64 only (no data: prefix)
                     },
                 },
                 { type: "text", text: `The above document is the ${label}.` },
             ];
         }
 
-        // Plain text fallback
         const safeText = typeof data === "string" ? data : JSON.stringify(data ?? "");
         return [{ type: "text", text: `${label}:\n\n${safeText}` }];
     }
 
-    const resumeContent = buildContent(resume, "candidate's current resume");
-    const jobContent = buildContent(jobDescription, "job description they are applying to");
+    let resumeContent, jobContent;
+    try {
+        resumeContent = buildContent(resume, "candidate's current resume");
+        jobContent = buildContent(jobDescription, "job description they are applying to");
+    } catch (e) {
+        return Response.json({ error: e.message }, { status: 400 });
+    }
 
     const messageContent = [
         ...resumeContent,
