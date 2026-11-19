@@ -1,8 +1,5 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  env: {
-    ANTHROPIC_KEY: process.env.ANTHROPIC_KEY,
-  },
-};
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {};
 
 export default nextConfig;
