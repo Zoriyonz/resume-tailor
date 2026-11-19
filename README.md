@@ -1,50 +1,21 @@
-# Resume Tailor — AI-Powered Resume Optimization
+# Resume Tailor
 
-A production-ready SaaS application that uses AI to tailor resumes to specific job descriptions, optimizing for ATS systems and human recruiters.
+Tailors a resume to a specific job posting. Live at https://resume-tailor-navy-chi.vercel.app
 
-**Live:** [resume-tailor-one-rust.vercel.app](https://resume-tailor-one-rust.vercel.app)
+## What it does
 
----
+You paste a resume and a job description. The app parses the posting, then rewrites and reweights your existing experience to match its keywords and priorities. It rephrases what is already true on your resume and does not invent experience.
 
-## What It Does
+## Stack
 
-Job seekers paste their resume and a job description. The AI rewrites the resume to mirror the exact keywords, tone, and structure that ATS systems and hiring managers look for — increasing interview callback rates.
+Next.js, React, TypeScript and Tailwind CSS. The rewrite runs through the Anthropic Claude API from a server-side route, and Stripe Payment Links handle the optional pay-per-use checkout. Deployed on Vercel.
 
----
+## Run it locally
 
-## Tech Stack
+Run npm install, create a .env.local file containing ANTHROPIC_API_KEY set to your own key, then run npm run dev and open http://localhost:3000. The key is read only on the server and is never exposed to the browser.
 
-- **Frontend:** Next.js 15, React, Tailwind CSS
-- **AI:** Anthropic Claude API (claude-haiku)
-- **Payments:** Stripe Payment Links
-- **Deployment:** Vercel
+## Status
 
----
+Prototype. Results depend on the model and should always be reviewed before you send a resume out.
 
-## Features
-
-- AI resume rewriting optimized for ATS keyword matching
-- Pay-per-use model ($2/resume) via Stripe
-- Instant results with copy-to-clipboard output
-- Fully responsive, mobile-friendly UI
-- Clean, minimal design with fast load times
-
----
-
-## Running Locally
-
-```bash
-npm install
-npm run dev
-```
-
-Add a `.env.local` file:
-```
-NEXT_PUBLIC_ANTHROPIC_KEY=your_key_here
-```
-
-Open [http://localhost:3000](http://localhost:3000)
-
----
-
-Built by Zoriyon Zion
+Built by Zoriyon Zion.
