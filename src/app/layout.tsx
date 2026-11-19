@@ -16,15 +16,14 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   title: "Resume Tailor – Land the Job",
-  description: "AI-powered resume tailoring. Upload your resume and job description — get a perfectly matched, ATS-optimized PDF in seconds.",
+  description:
+    "AI-powered resume tailoring. Upload your resume and job description — get a perfectly matched, ATS-optimized PDF in seconds.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${syne.variable} ${dmMono.variable}`}>
-        {children}
-      </body>
+      <body className={`${syne.variable} ${dmMono.variable}`}>{children}</body>
     </html>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,21 +15,28 @@ export default function SuccessPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const pendingResume = localStorage.getItem("pending_resume");
-    const pendingJob = localStorage.getItem("pending_job");
+    async function run() {
+      const pendingResume = localStorage.getItem("pending_resume");
+      const pendingJob = localStorage.getItem("pending_job");
 
-    if (!pendingResume || !pendingJob) {
-      setError("Session expired — paste your resume and job description again.");
-      setPageState("error");
-      return;
+      if (!pendingResume || !pendingJob) {
+        setError("Session expired — paste your resume and job description again.");
+        setPageState("error");
+        return;
+      }
+
+      localStorage.removeItem("pending_resume");
+      localStorage.removeItem("pending_job");
+
+      try {
+        setOutput(await runTailor(pendingResume, pendingJob));
+        setPageState("done");
+      } catch (err) {
+        setError("Something went wrong: " + (err as Error).message);
+        setPageState("error");
+      }
     }
-
-    localStorage.removeItem("pending_resume");
-    localStorage.removeItem("pending_job");
-
-    runTailor(pendingResume, pendingJob)
-      .then(result => { setOutput(result); setPageState("done"); })
-      .catch(err => { setError("Something went wrong: " + (err as Error).message); setPageState("error"); });
+    void run();
   }, []);
 
   function handleCopy() {
@@ -51,9 +59,18 @@ export default function SuccessPage() {
         {pageState === "error" && (
           <>
             <div className="error-msg">{error}</div>
-            <a href="/" className="btn-main" style={{ display: "inline-block", textDecoration: "none", textAlign: "center", marginTop: "12px" }}>
+            <Link
+              href="/"
+              className="btn-main"
+              style={{
+                display: "inline-block",
+                textDecoration: "none",
+                textAlign: "center",
+                marginTop: "12px",
+              }}
+            >
               ← Try again
-            </a>
+            </Link>
           </>
         )}
         {pageState === "done" && (

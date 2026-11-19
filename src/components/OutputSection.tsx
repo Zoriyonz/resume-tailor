@@ -14,7 +14,11 @@ export default function OutputSection({ output, loading, copied, onCopy }: Outpu
       {loading && (
         <div className="loading-state">
           <div className="spinner" />
-          <p>Rewriting your resume...<br />This takes about 15 seconds.</p>
+          <p>
+            Rewriting your resume...
+            <br />
+            This takes about 15 seconds.
+          </p>
         </div>
       )}
       {output && !loading && (

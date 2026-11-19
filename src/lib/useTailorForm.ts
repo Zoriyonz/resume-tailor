@@ -25,7 +25,9 @@ async function readFileAsBase64(file: File): Promise<string> {
           binary += String.fromCharCode(...Array.from(bytes.subarray(i, i + chunkSize)));
         }
         resolve(btoa(binary));
-      } catch (e) { reject(e); }
+      } catch (e) {
+        reject(e);
+      }
     };
     reader.onerror = () => reject(new Error("Failed to read file."));
     reader.readAsArrayBuffer(file);
@@ -52,13 +54,15 @@ export function useTailorForm(): UseTailorFormReturn {
   const resumeFileRef = useRef<HTMLInputElement>(null);
   const jobFileRef = useRef<HTMLInputElement>(null);
 
-  const canSubmit = !loading && (
-    (resume.mode === "text" ? resume.text.trim().length > 50 : (!!resume.file && !!resume.pdfB64)) &&
-    (job.mode === "text" ? job.text.trim().length > 50 : (!!job.file && !!job.pdfB64))
-  );
+  const canSubmit =
+    !loading &&
+    (resume.mode === "text" ? resume.text.trim().length > 50 : !!resume.file && !!resume.pdfB64) &&
+    (job.mode === "text" ? job.text.trim().length > 50 : !!job.file && !!job.pdfB64);
 
   async function triggerTailor(r: string, j: string) {
-    setLoading(true); setError(""); setOutput("");
+    setLoading(true);
+    setError("");
+    setOutput("");
     try {
       const result = await runTailor(r, j);
       setOutput(result);
@@ -74,14 +78,17 @@ export function useTailorForm(): UseTailorFormReturn {
     setter: React.Dispatch<React.SetStateAction<FieldState>>,
   ) {
     if (!file) return;
-    if (file.type !== "application/pdf") { setError("Please upload a .pdf file."); return; }
+    if (file.type !== "application/pdf") {
+      setError("Please upload a .pdf file.");
+      return;
+    }
     setError("");
-    setter(prev => ({ ...prev, file, pdfB64: null }));
+    setter((prev) => ({ ...prev, file, pdfB64: null }));
     try {
       const b64 = await readFileAsBase64(file);
-      setter(prev => ({ ...prev, pdfB64: b64 }));
+      setter((prev) => ({ ...prev, pdfB64: b64 }));
     } catch (e) {
-      setter(prev => ({ ...prev, file: null, pdfB64: null }));
+      setter((prev) => ({ ...prev, file: null, pdfB64: null }));
       setError((e as Error).message || "Invalid PDF.");
     }
   }
@@ -92,17 +99,25 @@ export function useTailorForm(): UseTailorFormReturn {
     let jobData = job.text;
 
     if (resume.mode === "pdf") {
-      if (!resume.file || !resume.pdfB64) { setError("Please upload your resume PDF."); return; }
+      if (!resume.file || !resume.pdfB64) {
+        setError("Please upload your resume PDF.");
+        return;
+      }
       resumeData = "__PDF__" + resume.pdfB64;
     } else if (resumeData.trim().length < 50) {
-      setError("Please paste your resume."); return;
+      setError("Please paste your resume.");
+      return;
     }
 
     if (job.mode === "pdf") {
-      if (!job.file || !job.pdfB64) { setError("Please upload the job description PDF."); return; }
+      if (!job.file || !job.pdfB64) {
+        setError("Please upload the job description PDF.");
+        return;
+      }
       jobData = "__PDF__" + job.pdfB64;
     } else if (jobData.trim().length < 50) {
-      setError("Please paste the job description."); return;
+      setError("Please paste the job description.");
+      return;
     }
 
     if (BYPASS_STRIPE) {
@@ -110,21 +125,37 @@ export function useTailorForm(): UseTailorFormReturn {
       return;
     }
 
-    if (resume.mode === "text") localStorage.setItem("pending_resume", resumeData);
-    if (job.mode === "text") localStorage.setItem("pending_job", jobData);
+    // Stash both inputs (text, or "__PDF__" + base64) so they survive the Stripe redirect.
+    try {
+      localStorage.setItem("pending_resume", resumeData);
+      localStorage.setItem("pending_job", jobData);
+    } catch {
+      setError("That input is too large to keep through checkout. Try pasting the text instead.");
+      return;
+    }
 
     setShowPayModal(true);
   }
 
-  const state: TailorFormState = { resume, job, output, loading, error, copied, paymentSuccess, showPayModal, canSubmit };
+  const state: TailorFormState = {
+    resume,
+    job,
+    output,
+    loading,
+    error,
+    copied,
+    paymentSuccess,
+    showPayModal,
+    canSubmit,
+  };
 
   const actions: TailorFormActions = {
-    setResumeText: (text) => setResume(prev => ({ ...prev, text })),
-    setJobText: (text) => setJob(prev => ({ ...prev, text })),
-    setResumeMode: (mode) => setResume(prev => ({ ...prev, mode })),
-    setJobMode: (mode) => setJob(prev => ({ ...prev, mode })),
-    setResumeDragging: (v) => setResume(prev => ({ ...prev, dragging: v })),
-    setJobDragging: (v) => setJob(prev => ({ ...prev, dragging: v })),
+    setResumeText: (text) => setResume((prev) => ({ ...prev, text })),
+    setJobText: (text) => setJob((prev) => ({ ...prev, text })),
+    setResumeMode: (mode) => setResume((prev) => ({ ...prev, mode })),
+    setJobMode: (mode) => setJob((prev) => ({ ...prev, mode })),
+    setResumeDragging: (v) => setResume((prev) => ({ ...prev, dragging: v })),
+    setJobDragging: (v) => setJob((prev) => ({ ...prev, dragging: v })),
     handleResumeFile: (f) => handleFileChange(f, setResume),
     handleJobFile: (f) => handleFileChange(f, setJob),
     handleDrop: async (e, type) => {
@@ -132,15 +163,17 @@ export function useTailorForm(): UseTailorFormReturn {
       const file = e.dataTransfer.files?.[0];
       if (!file || file.type !== "application/pdf") return;
       if (type === "resume") {
-        setResume(prev => ({ ...prev, dragging: false }));
+        setResume((prev) => ({ ...prev, dragging: false }));
         await handleFileChange(file, setResume);
       } else {
-        setJob(prev => ({ ...prev, dragging: false }));
+        setJob((prev) => ({ ...prev, dragging: false }));
         await handleFileChange(file, setJob);
       }
     },
     handleSubmit,
-    handlePay: () => { window.location.href = STRIPE_URL; },
+    handlePay: () => {
+      window.location.href = STRIPE_URL;
+    },
     handleCopy: () => {
       navigator.clipboard.writeText(output);
       setCopied(true);

@@ -9,7 +9,8 @@ import { useTailorForm } from "@/lib/useTailorForm";
 
 export default function HomePage() {
   const { state, actions } = useTailorForm();
-  const { resume, job, output, loading, error, copied, paymentSuccess, showPayModal, canSubmit } = state;
+  const { resume, job, output, loading, error, copied, paymentSuccess, showPayModal, canSubmit } =
+    state;
 
   return (
     <>
@@ -35,16 +36,21 @@ export default function HomePage() {
           onResumeModeChange={actions.setResumeMode}
           onResumeDraggingChange={actions.setResumeDragging}
           onResumeFileChange={actions.handleResumeFile}
-          onResumeDrop={e => actions.handleDrop(e, "resume")}
+          onResumeDrop={(e) => actions.handleDrop(e, "resume")}
           onJobTextChange={actions.setJobText}
           onJobModeChange={actions.setJobMode}
           onJobDraggingChange={actions.setJobDragging}
           onJobFileChange={actions.handleJobFile}
-          onJobDrop={e => actions.handleDrop(e, "job")}
+          onJobDrop={(e) => actions.handleDrop(e, "job")}
           onSubmit={actions.handleSubmit}
         />
 
-        <OutputSection output={output} loading={loading} copied={copied} onCopy={actions.handleCopy} />
+        <OutputSection
+          output={output}
+          loading={loading}
+          copied={copied}
+          onCopy={actions.handleCopy}
+        />
 
         <Footer />
       </div>

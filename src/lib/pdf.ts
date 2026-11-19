@@ -1,7 +1,19 @@
 const SECTION_KEYWORDS = [
-  "EXPERIENCE", "EDUCATION", "SKILLS", "SUMMARY", "OBJECTIVE",
-  "CERTIFICATIONS", "PROJECTS", "AWARDS", "PUBLICATIONS", "LANGUAGES",
-  "INTERESTS", "VOLUNTEER", "REFERENCES", "WORK EXPERIENCE", "PROFESSIONAL EXPERIENCE",
+  "EXPERIENCE",
+  "EDUCATION",
+  "SKILLS",
+  "SUMMARY",
+  "OBJECTIVE",
+  "CERTIFICATIONS",
+  "PROJECTS",
+  "AWARDS",
+  "PUBLICATIONS",
+  "LANGUAGES",
+  "INTERESTS",
+  "VOLUNTEER",
+  "REFERENCES",
+  "WORK EXPERIENCE",
+  "PROFESSIONAL EXPERIENCE",
 ];
 
 function escapeHtml(s: string): string {
@@ -16,15 +28,23 @@ function buildSectionHtml(lines: string[]): string {
   for (const line of lines) {
     const isBullet = line.startsWith("•") || line.startsWith("-") || line.startsWith("▸");
     if (isBullet) {
-      if (!inList) { body += "<ul>"; inList = true; }
+      if (!inList) {
+        body += "<ul>";
+        inList = true;
+      }
       body += `<li>${escapeHtml(line.replace(/^[•\-▸]\s*/, ""))}</li>`;
     } else {
-      if (inList) { body += "</ul>"; inList = false; }
+      if (inList) {
+        body += "</ul>";
+        inList = false;
+      }
       if (firstNonBullet) {
         body += `<p class="role-line">${escapeHtml(line)}</p>`;
         firstNonBullet = false;
       } else {
-        const isDate = /\d{4}/.test(line) || /present/i.test(line) ||
+        const isDate =
+          /\d{4}/.test(line) ||
+          /present/i.test(line) ||
           /jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(line);
         body += `<p class="${isDate ? "date-line" : "body-line"}">${escapeHtml(line)}</p>`;
         if (!isDate) firstNonBullet = true;
@@ -44,9 +64,12 @@ export function downloadAsPDF(text: string): void {
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (!trimmed) { if (parsingHeader) parsingHeader = false; continue; }
+    if (!trimmed) {
+      if (parsingHeader) parsingHeader = false;
+      continue;
+    }
     const upper = trimmed.toUpperCase();
-    const isSection = SECTION_KEYWORDS.some(k => upper === k || upper === k + ":");
+    const isSection = SECTION_KEYWORDS.some((k) => upper === k || upper === k + ":");
     if (isSection) {
       parsingHeader = false;
       if (currentSection) sections.push(currentSection);
@@ -60,14 +83,22 @@ export function downloadAsPDF(text: string): void {
   }
   if (currentSection) sections.push(currentSection);
 
-  const headerHtml = headerLines.map((l, i) =>
-    i === 0 ? `<h1 class="name">${escapeHtml(l)}</h1>` : `<p class="contact">${escapeHtml(l)}</p>`
-  ).join("");
+  const headerHtml = headerLines
+    .map((l, i) =>
+      i === 0
+        ? `<h1 class="name">${escapeHtml(l)}</h1>`
+        : `<p class="contact">${escapeHtml(l)}</p>`,
+    )
+    .join("");
 
-  const sectionsHtml = sections.map(sec => `<div class="section">
+  const sectionsHtml = sections
+    .map(
+      (sec) => `<div class="section">
     ${sec.title ? `<div class="sec-header"><span class="sec-title">${escapeHtml(sec.title)}</span></div>` : ""}
     <div class="sec-body">${buildSectionHtml(sec.lines)}</div>
-  </div>`).join("");
+  </div>`,
+    )
+    .join("");
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Resume</title>
 <style>
@@ -99,5 +130,8 @@ export function downloadAsPDF(text: string): void {
 </body></html>`;
 
   const w = window.open("", "_blank");
-  if (w) { w.document.write(html); w.document.close(); }
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+  }
 }
